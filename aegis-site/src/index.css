@@ -20,3 +20,28 @@ body {
   background: radial-gradient(60% 50% at 70% 0%, rgba(126,242,176,0.10), transparent 60%),
               radial-gradient(40% 40% at 10% 30%, rgba(126,242,176,0.06), transparent 60%);
 }
+
+::selection {
+  background: rgba(143, 247, 189, 0.28);
+  color: #f2f6f4;
+}
+
+:focus-visible {
+  outline: 2px solid #8ff7bd;
+  outline-offset: 2px;
+}
+
+/* Thin, unobtrusive scrollbar that matches the mint/dark palette */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #050b09; }
+::-webkit-scrollbar-thumb { background: #16261f; border-radius: 8px; border: 2px solid #050b09; }
+::-webkit-scrollbar-thumb:hover { background: #1e332a; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
