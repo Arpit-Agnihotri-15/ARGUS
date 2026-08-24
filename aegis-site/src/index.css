@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #050b09;
+  color: #f2f6f4;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.bg-fade {
+  background: radial-gradient(60% 50% at 70% 0%, rgba(126,242,176,0.10), transparent 60%),
+              radial-gradient(40% 40% at 10% 30%, rgba(126,242,176,0.06), transparent 60%);
+}
