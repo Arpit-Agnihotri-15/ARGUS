@@ -31,6 +31,7 @@ const NAV_LINKS = [
   { id: "problem", label: "Problem" },
   { id: "overview", label: "How it works" },
   { id: "architecture", label: "Architecture" },
+  { id: "ai-model", label: "AI Model" },
   { id: "coverage", label: "Coverage" },
   { id: "boundary", label: "Privacy" },
   { id: "roadmap", label: "Roadmap" },
@@ -263,7 +264,7 @@ const PROBLEM_POINTS = [
   {
     icon: "🕳️",
     title: "No forensic trail",
-    desc: "Even when a fraudulent email is identified, most tools can't reconstruct where it came from — no header analysis, no origin trace, no correlation.",
+    desc: "Even when a fraudulent email is identified, most tools can't reconstruct where it came from — no header/relay analysis, no origin trace, no graph-based correlation between senders, IPs and campaigns.",
   },
 ];
 
@@ -304,7 +305,7 @@ function Problem() {
 
 const MEMBRANES = [
   { id: "M0", icon: "🫆", title: "Trusted sender", module: "background.js", desc: "Known contacts stay in control while every message is still checked — trust is reversible, not permanent." },
-  { id: "M1", icon: "✅", title: "Identity & auth", module: "senderIdentity.js · doh.js", desc: "SPF/DMARC posture, display-name spoofing and Reply-To mismatches surface in plain language." },
+  { id: "M1", icon: "✅", title: "Identity & auth", module: "senderIdentity.js · doh.js", desc: "SPF/DMARC posture, display-name spoofing and Reply-To mismatches surface in plain language today — DKIM signature validation and Return-Path/Message-ID relay-anomaly checks are the next layer, see Roadmap." },
   { id: "M2", icon: "🌐", title: "Lookalike & link intel", module: "confusables.js · linkAnalysis.js", desc: "Homoglyph domains, redirects, punycode and young/lookalike domains are exposed before you click." },
   { id: "M3", icon: "🔍", title: "Content + attachments", module: "attachmentAnalysis.js", desc: "Social-engineering language and risky filename tricks (double extensions) become visible signals, not invisible verdicts." },
   { id: "M4", icon: "🎯", title: "Explainable score", module: "trustScore.js", desc: "Every membrane's evidence rolls into one weighted, traceable 0–100 score — Safe, Warning or Soft Quarantine." },
@@ -384,7 +385,7 @@ function Overview() {
 
 const PIPELINE = [
   { id: "M0", title: "Trusted sender", sub: "Local sender history", icon: "🫆", detail: "No reputation penalty for known contacts. This evidence stays visible in the final score breakdown rather than silently skipping checks.", tag: "IMPLEMENTED", module: "background.js" },
-  { id: "M1", title: "Identity + auth", sub: "SPF / DMARC posture", icon: "✅", detail: "Authentication mismatches and display-name spoofing are named in plain language, not left buried in raw headers.", tag: "IMPLEMENTED", module: "senderIdentity.js · doh.js" },
+  { id: "M1", title: "Identity + auth", sub: "SPF / DMARC posture", icon: "✅", detail: "Authentication mismatches and display-name spoofing are named in plain language, not left buried in raw headers. Deeper protocol forensics — DKIM signature validation, Return-Path/Message-ID anomalies, forged relay detection — are scoped as the next header-module milestone.", tag: "IMPLEMENTED", module: "senderIdentity.js · doh.js" },
   { id: "M2", title: "Domain intelligence", sub: "DNS + RDAP lookups", icon: "🌐", detail: "Only the public sender domain is queried against DNS and RDAP for registration age — never message content.", tag: "IMPLEMENTED", module: "rdap.js" },
   { id: "M3", title: "Content + links", sub: "Local pattern checks", icon: "🔍", detail: "Urgency language, lookalike domains and risky link/attachment patterns are checked entirely on-device.", tag: "IMPLEMENTED", module: "linkAnalysis.js · confusables.js" },
   { id: "M4", title: "Decision layer", sub: "Weighted evidence", icon: "🎯", detail: "All membrane evidence rolls into one traceable, explainable score with a Safe / Warning / Soft Quarantine verdict.", tag: "IMPLEMENTED", module: "trustScore.js" },
@@ -452,16 +453,121 @@ function Architecture() {
 }
 
 /* -------------------------------------------------------------------------
+ * AI Model — the NLP/ML classification layer called for explicitly in the
+ * problem statement's "Fraudulent Email Detection Engine" component. Kept
+ * clearly labeled as planned/hybrid rather than implying a trained model
+ * ships today — the deterministic rule engine (trustScore.js) is what's
+ * actually live; this section is the honest architecture for what's next.
+ * ---------------------------------------------------------------------- */
+
+const AI_CLASSES = [
+  { label: "Legitimate", tone: "text-mint" },
+  { label: "Suspicious", tone: "text-amber" },
+  { label: "Impersonated", tone: "text-amber" },
+  { label: "Phishing", tone: "text-rose" },
+  { label: "Fraud-related", tone: "text-rose" },
+];
+
+const AI_FEATURES = [
+  {
+    icon: "🧠",
+    title: "NLP content classification",
+    desc: "A compact semantic model reads subject/body text for urgency cues, impersonation language and reworded social-engineering phrasing — catching phishing language that doesn't match a fixed keyword list.",
+  },
+  {
+    icon: "💼",
+    title: "BEC pattern recognition",
+    desc: "Trained sub-patterns for business email compromise: payment-redirection requests, fake invoices, executive impersonation and credential-harvesting prompts, labeled explicitly rather than folded into a generic score.",
+  },
+  {
+    icon: "🕸️",
+    title: "Graph-based attribution",
+    desc: "Sender domains, IPs, ASNs, reply chains and aliases are modeled as a graph so repeated infrastructure and campaign-level clusters become visible, not just isolated per-email verdicts.",
+  },
+  {
+    icon: "📊",
+    title: "Confidence, not certainty",
+    desc: "Every model output ships as a probability with a confidence band — high/medium/low — the same honesty standard already applied to geolocation and attribution.",
+  },
+];
+
+function AIModel() {
+  return (
+    <section id="ai-model" className="max-w-7xl mx-auto px-6 sm:px-8 py-20 sm:py-28">
+      <Reveal>
+        <div className="flex items-center gap-3 mb-6 flex-wrap">
+          <Eyebrow color="text-amber">AI / ML CLASSIFICATION LAYER</Eyebrow>
+          <span className="mono text-[10px] border border-dashed border-amber/60 text-amber rounded px-2.5 py-1">
+            PLANNED — SEE ROADMAP
+          </span>
+        </div>
+        <h2 className="text-4xl sm:text-5xl font-semibold leading-tight mb-6">
+          Explainable rules today, <br /> <span className="text-mint">a trained model next.</span>
+        </h2>
+        <p className="text-muted text-lg max-w-2xl mb-6">
+          The problem statement calls for AI/ML models that classify each email as legitimate,
+          suspicious, impersonated, phishing, or fraud-related. Today's trust score is a deterministic,
+          weighted rule engine — fully explainable, but not itself a trained classifier. The next layer
+          adds an NLP/ML model on top, without giving up that explainability.
+        </p>
+      </Reveal>
+
+      <Reveal className="bg-panel border border-line rounded-md p-6 sm:p-8 mb-10">
+        <div className="mono text-[11px] text-muted tracking-widest mb-5">MODEL OUTPUT — FIVE-WAY CLASSIFICATION</div>
+        <div className="flex flex-wrap gap-3 mb-6">
+          {AI_CLASSES.map((c) => (
+            <span key={c.label} className={`mono text-xs border border-line rounded-full px-4 py-1.5 ${c.tone}`}>
+              {c.label}
+            </span>
+          ))}
+        </div>
+        <div className="text-sm text-muted max-w-2xl">
+          Each classification is written back into the score as one more named, weighted signal — the
+          same pattern used for SPF posture or domain age — so a model verdict never appears as an
+          unexplained black-box label.
+        </div>
+      </Reveal>
+
+      <div className="grid md:grid-cols-2 gap-px bg-line">
+        {AI_FEATURES.map((f, i) => (
+          <Reveal key={f.title} delay={i * 80} className="bg-ink p-6">
+            <span className="w-11 h-11 rounded-md bg-panel border border-line flex items-center justify-center text-xl mb-5">
+              {f.icon}
+            </span>
+            <div className="font-semibold text-lg mb-2">{f.title}</div>
+            <p className="text-sm text-muted">{f.desc}</p>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={120} className="mt-10 bg-panel2 border border-line rounded-md px-6 py-5 flex items-start gap-3 text-sm">
+        <span className="text-amber">✦</span>
+        <span>
+          <strong>Why this stays honest, not marketing:</strong>{" "}
+          <span className="text-muted">
+            The Coverage section below scores "AI/ML-based classification" at 0% today — the rule
+            engine it will sit on top of is what's actually shipped. See{" "}
+            <a href="#roadmap" className="text-mint border-b border-mint/40 hover:border-mint">Roadmap</a> for
+            the build sequence.
+          </span>
+        </span>
+      </Reveal>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------
  * Coverage — honest current-state percentages, straight from the PRD.
  * This is the section that keeps the whole site honest: nothing here is
  * allowed to imply a roadmap item is live today.
  * ---------------------------------------------------------------------- */
 
 const COVERAGE = [
-  { label: "Fraudulent email detection engine", pct: 75 },
+  { label: "Fraudulent email detection engine (rule-based)", pct: 75 },
+  { label: "AI/ML-based content classification (NLP)", pct: 0 },
   { label: "Email header & protocol analysis", pct: 50 },
   { label: "Origin traceability & geolocation", pct: 5 },
-  { label: "Identity correlation & attribution", pct: 0 },
+  { label: "Identity correlation & attribution (graph-based)", pct: 0 },
   { label: "Alerting, dashboard & forensic reporting", pct: 40 },
   { label: "Privacy, legal & compliance safeguards", pct: 80 },
 ];
@@ -510,8 +616,10 @@ function Coverage() {
           <span className="text-3xl font-bold text-mint">~40%</span>
         </div>
         <p className="text-sm text-muted mt-4">
-          Targeting ~85–90% once origin tracing, geolocation and attribution ship — see{" "}
-          <a href="#roadmap" className="text-mint border-b border-mint/40 hover:border-mint">Roadmap</a>.
+          Targeting ~85–90% once the AI/ML classifier, deeper header forensics, origin tracing and
+          attribution ship — see <a href="#roadmap" className="text-mint border-b border-mint/40 hover:border-mint">Roadmap</a>.
+          The AI/ML row is tracked separately from the detection engine's rule-based score above it, so
+          it doesn't change the officially reported ~40% overall figure by itself.
         </p>
       </Reveal>
     </section>
@@ -526,6 +634,7 @@ const BOUNDARY = [
   { icon: "🔒", title: "Local first", desc: "Message content and analysis stay inside the browser — nothing is uploaded to a server for scoring." },
   { icon: "🌐", title: "Domain only", desc: "DNS and RDAP receive public domain lookups only — never the sender's message body or attachments." },
   { icon: "🔔", title: "Opt-in headers", desc: "Deeper provider metadata (Gmail OAuth) is an explicit, revocable user choice — never default-on." },
+  { icon: "🗂️", title: "Evidence-ready logs", desc: "Structured, timestamped metadata logging is designed to support chain-of-custody and configurable retention/masking for institutional review — not a legal chain-of-custody artifact by itself." },
 ];
 
 const NOT_DO = [
@@ -691,22 +800,29 @@ const ROADMAP = [
     n: "01",
     tag: "NEXT",
     tagRight: "FUTURE SCOPE",
-    title: "Origin trace",
-    desc: "headerChain.js parses the Received-header stack; ipExtract.js walks the hops to isolate the most likely originating IP, with a confidence label.",
+    title: "AI/ML classification layer",
+    desc: "An NLP/ML model classifying each email as legitimate, suspicious, impersonated, phishing or fraud-related, plus explicit BEC sub-patterns (payment redirection, fake invoices, executive impersonation) — feeding into the score as a labeled signal, not a black box. See the AI Model section above.",
   },
   {
     n: "02",
     tag: "NEXT",
     tagRight: "FUTURE SCOPE",
-    title: "Geolocation & attribution",
-    desc: "geoIntel.js geolocates the origin IP and flags VPN/proxy/TOR/hosting infrastructure; attribution.js correlates repeated infrastructure across scans into campaign clusters.",
+    title: "Deeper header & protocol forensics",
+    desc: "DKIM signature validation, Return-Path and Message-ID anomaly checks, and detection of forged sender fields or manipulated relay paths — extending today's SPF/DMARC posture checks.",
   },
   {
     n: "03",
     tag: "LATER",
     tagRight: "FUTURE SCOPE",
-    title: "Forensic dashboard & BEC depth",
-    desc: "A dedicated Origin & Attribution panel, an extended exportable forensic report, and explicit BEC sub-patterns (payment redirection, fake invoices, executive impersonation).",
+    title: "Origin trace",
+    desc: "headerChain.js parses the Received-header stack; ipExtract.js walks the hops to isolate the most likely originating IP, with a confidence label.",
+  },
+  {
+    n: "04",
+    tag: "LATER",
+    tagRight: "FUTURE SCOPE",
+    title: "Geolocation & graph-based attribution",
+    desc: "geoIntel.js geolocates the origin IP and flags VPN/proxy/TOR/hosting infrastructure; attribution.js models domains, IPs, ASNs and reply chains as a graph to correlate campaigns, with a searchable case-management view for grouping related fraud attempts.",
   },
 ];
 
@@ -791,6 +907,7 @@ export default function App() {
       <Problem />
       <Overview />
       <Architecture />
+      <AIModel />
       <Coverage />
       <Boundary />
       <Limitations />
