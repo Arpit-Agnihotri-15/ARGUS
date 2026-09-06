@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/athena.js": {
+      "maxDuration": 20
+    }
+  }
+}
