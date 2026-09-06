@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { downloadSingleEmailReport } from "../utils/pdfGenerator.js";
 
 const PRESETS = [
@@ -50,6 +50,33 @@ export function LiveSimulator() {
   const [syncStatus, setSyncStatus] = useState(null);
   const [recentScans, setRecentScans] = useState([]);
 
+  // Live reactive analysis: executes on mount and whenever any field changes
+  useEffect(() => {
+    const hasContent = form.sender || form.subject || form.body || form.links || form.attachments;
+    if (!hasContent) {
+      setResult(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      runAnalysis(form);
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [form.sender, form.subject, form.body, form.links, form.attachments, form.displayName]);
+
+  const handleClear = () => {
+    const empty = {
+      name: "Custom Inspection",
+      sender: "",
+      displayName: "",
+      subject: "",
+      body: "",
+      links: "",
+      attachments: ""
+    };
+    setForm(empty);
+    setResult(null);
+  };
+
   const applyPreset = (preset) => {
     setForm(preset);
     runAnalysis(preset);
@@ -65,17 +92,33 @@ export function LiveSimulator() {
           if (res && res.ok && res.telemetry) {
             const last = res.telemetry.lastScan;
             const rawMap = res.telemetry.scanResultsByEmail || {};
-            const recentList = Object.entries(rawMap).map(([email, item]) => ({
-              email,
-              subject: item?.subjectKey || "Email Message",
-              score: item?.score ?? 50,
-              outcome: item?.outcome || "SAFE_INBOX",
-              displayName: item?.senderDisplayName || email.split("@")[0],
-              ts: item?.ts || 0,
-              snippet: item?.snippet || item?.bodyText || "",
-              links: Array.isArray(item?.linksScanned) ? item.linksScanned.join("\n") : (item?.links || ""),
-              attachments: Array.isArray(item?.attachments) ? item.attachments.map(a => a.name || a).join(", ") : ""
-            })).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+            const recentList = Object.entries(rawMap).map(([email, item]) => {
+              const deductionsList = [];
+              const summary = item?.summary || {};
+              Object.entries(summary).forEach(([cat, list]) => {
+                (list || []).forEach(sub => {
+                  deductionsList.push({
+                    category: cat,
+                    detail: sub.label,
+                    delta: sub.delta ?? -10
+                  });
+                });
+              });
+
+              return {
+                email,
+                subject: item?.subjectKey || "Email Message",
+                score: item?.score ?? 50,
+                outcome: item?.outcome || "SAFE_INBOX",
+                displayName: item?.senderDisplayName || email.split("@")[0],
+                ts: item?.ts || 0,
+                snippet: item?.snippet || item?.bodyText || "",
+                links: Array.isArray(item?.linksScanned) ? item.linksScanned.join("\n") : (item?.links || ""),
+                attachments: Array.isArray(item?.attachments) ? item.attachments.map(a => a.name || a).join(", ") : "",
+                actionAssurance: item?.actionAssurance,
+                deductions: deductionsList
+              };
+            }).sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
             setRecentScans(recentList);
 
@@ -133,16 +176,21 @@ export function LiveSimulator() {
   const runAnalysis = (data = form) => {
     setIsAnalyzing(true);
     setTimeout(() => {
-      let score = 100;
-      const deductions = [];
-      let actionType = "INFORMATIONAL";
-      let actionDecision = "ALLOWED";
-      let actionReason = "No sensitive authorization requested";
+      let score = data.realScore !== undefined ? data.realScore : 100;
+      let deductions = Array.isArray(data.realDeductions) && data.realDeductions.length > 0 ? [...data.realDeductions] : [];
+      let actionType = data.realAction?.requestedAction || "INFORMATIONAL";
+      let actionDecision = data.realAction?.decision || "ALLOWED";
+      let actionReason = data.realAction?.reason || "No sensitive authorization requested";
 
       const senderLower = (data.sender || "").toLowerCase();
+      const subjectLower = (data.subject || "").toLowerCase();
       const bodyLower = (data.body || "").toLowerCase();
       const attachLower = (data.attachments || "").toLowerCase();
       const linksLower = (data.links || "").toLowerCase();
+      const combinedText = `${subjectLower} ${bodyLower}`;
+
+      if (data.realScore === undefined) {
+        // Run heuristic evaluations on combined subject and body
 
       // 1. Unicode Lookalike / Confusable check
       // Cyrillic 'а' (\u0430) vs Latin 'a' (\u0061)
@@ -169,8 +217,8 @@ export function LiveSimulator() {
       }
 
       // 3. Financial Diversion / Wire patterns
-      if (/\b(wire|bank|payment|invoice|iban|beneficiary|remit|swift)\b/i.test(bodyLower) &&
-          /\b(update|change|new account|revised|divert|instructions)\b/i.test(bodyLower)) {
+      if (/\b(wire|bank|payment|invoice|iban|beneficiary|remit|swift)\b/i.test(combinedText) &&
+          /\b(update|change|new account|revised|divert|instructions)\b/i.test(combinedText)) {
         score -= 25;
         deductions.push({
           category: "BEC / Financial Diversion",
@@ -183,8 +231,8 @@ export function LiveSimulator() {
       }
 
       // 4. Credential Harvest / Login patterns
-      if (/\b(sign[ -]?in|log[ -]?in|password|passcode|verify|confirm account|security code)\b/i.test(bodyLower)) {
-        if (score < 80 || /urgent|immediate|limited|suspend/i.test(bodyLower)) {
+      if (/\b(sign[ -]?in|log[ -]?in|password|passcode|verify|confirm account|security code)\b/i.test(combinedText)) {
+        if (score < 80 || /urgent|immediate|limited|suspend/i.test(combinedText)) {
           score -= 20;
           deductions.push({
             category: "Credential Harvesting",
@@ -198,7 +246,7 @@ export function LiveSimulator() {
       }
 
       // 5. Artificial Urgency / Pressure
-      if (/\b(urgent|immediately|within 24 hours|account limited|action required|final notice|suspended)\b/i.test(bodyLower)) {
+      if (/\b(urgent|immediately|within 24 hours|account limited|action required|final notice|suspended)\b/i.test(combinedText)) {
         score -= 15;
         deductions.push({
           category: "Social Engineering",
@@ -215,6 +263,8 @@ export function LiveSimulator() {
           detail: "High-risk top-level domain frequently associated with throwaway phishing kits",
           delta: -15
         });
+      }
+
       }
 
       const finalScore = Math.max(5, Math.min(100, score));
@@ -338,7 +388,11 @@ export function LiveSimulator() {
                       subject: r.subject,
                       body: r.snippet || `[Mailbox Scanned Email] Sender: ${r.email}`,
                       links: r.links || "",
-                      attachments: r.attachments || ""
+                      attachments: r.attachments || "",
+                      realScore: r.score,
+                      realOutcome: r.outcome,
+                      realDeductions: r.deductions,
+                      realAction: r.actionAssurance
                     };
                     setForm(s);
                     runAnalysis(s);
@@ -388,8 +442,17 @@ export function LiveSimulator() {
         {/* Input Form */}
         <div className="lg:col-span-6 bg-panel border border-line rounded-lg p-5 space-y-4">
           <div className="font-semibold text-sm border-b border-line pb-3 flex items-center justify-between">
-            <span>Email Header & Content Fields</span>
-            <span className="mono text-[10px] text-mint">ON-DEVICE PARSER</span>
+            <div className="flex items-center gap-2">
+              <span>Email Header &amp; Content Fields</span>
+              <span className="mono text-[10px] text-mint bg-panel2 border border-line px-2 py-0.5 rounded">ON-DEVICE PARSER</span>
+            </div>
+            <button
+              onClick={handleClear}
+              className="mono text-[11px] text-muted hover:text-rose transition-colors cursor-pointer"
+              title="Clear all fields to inspect a custom email"
+            >
+              ✕ Clear All Fields
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -460,7 +523,7 @@ export function LiveSimulator() {
           </div>
 
           <button
-            onClick={() => runAnalysis()}
+            onClick={() => runAnalysis(form)}
             disabled={isAnalyzing}
             className="w-full bg-mint text-ink font-semibold py-2.5 rounded text-xs hover:bg-mintdim active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
@@ -573,8 +636,22 @@ export function LiveSimulator() {
               </div>
             </div>
           ) : (
-            <div className="bg-panel border border-dashed border-line rounded-lg p-12 text-center text-muted text-xs">
-              Click &quot;Execute Membrane Analysis&quot; or select one of the attack presets above to simulate live email evaluation.
+            <div className="bg-panel border border-dashed border-line rounded-lg p-10 text-center space-y-3">
+              <div className="w-10 h-10 rounded-full bg-mint/10 border border-mint/40 text-mint flex items-center justify-center mx-auto text-lg">
+                ⚡
+              </div>
+              <h4 className="font-semibold text-white text-sm">Ready for On-Device Membrane Analysis</h4>
+              <p className="text-muted text-xs max-w-sm mx-auto leading-relaxed">
+                Type any sender, subject, links, attachments, or body on the left. The client-side ML pipeline executes live in your browser and displays the forensic dossier here.
+              </p>
+              <div className="flex justify-center gap-2 pt-2">
+                <button
+                  onClick={() => applyPreset(PRESETS[0])}
+                  className="mono text-xs border border-mint/40 text-mint hover:bg-mint/10 px-3.5 py-1.5 rounded transition-colors cursor-pointer"
+                >
+                  Load Example Threat Scenario
+                </button>
+              </div>
             </div>
           )}
         </div>

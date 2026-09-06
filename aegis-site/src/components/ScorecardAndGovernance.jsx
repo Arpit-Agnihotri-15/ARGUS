@@ -108,7 +108,7 @@ export function ScorecardAndGovernance() {
   return (
     <div className="space-y-20 max-w-7xl mx-auto px-6 sm:px-8 py-12">
       {/* 1. Problem Statement Section */}
-      <section id="problem" className="bg-panel border border-line rounded-lg p-6 sm:p-10 space-y-6">
+      <section id="problem" className="bg-panel border border-line rounded-lg p-6 sm:p-10 space-y-6 scroll-mt-20">
         <div className="flex items-center gap-2 mono text-xs tracking-widest text-mint mb-2">
           <span className="w-6 h-px bg-current inline-block" />
           SMART INDIA HACKATHON 2026 · PROBLEM STATEMENT ID: 26106
@@ -142,13 +142,13 @@ export function ScorecardAndGovernance() {
         </div>
       </section>
 
-      {/* 2. Honest Phase Scorecard */}
-      <section id="coverage" className="space-y-6">
+      {/* 2. Project Scorecard */}
+      <section id="coverage" className="space-y-6 scroll-mt-20">
         <div>
-          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">HONEST PHASE COMPLETIONS</div>
-          <h2 className="text-3xl font-bold text-white">Verified Progress Scorecard</h2>
+          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">PROJECT SCORECARD · HONEST PROGRESS</div>
+          <h2 className="text-3xl font-bold text-white">Project Scorecard</h2>
           <p className="text-muted text-sm max-w-2xl mt-1">
-            To preserve evidentiary credibility with SIH evaluators, we strictly separate completed Phase 1 capabilities from Phase 2 in-progress modules.
+            Features currently completed and running versus upcoming Phase 2 and Phase 3 capabilities.
           </p>
         </div>
 
@@ -183,13 +183,13 @@ export function ScorecardAndGovernance() {
         </div>
       </section>
 
-      {/* 3. Privacy & Zero-Storage Boundary */}
-      <section id="boundary" className="space-y-6">
+      {/* 3. Privacy & Security */}
+      <section id="boundary" className="space-y-6 scroll-mt-20">
         <div>
-          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">ARCHITECTURAL BOUNDARIES</div>
-          <h2 className="text-3xl font-bold text-white">Privacy Non-Negotiables</h2>
+          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">PRIVACY &amp; SECURITY GUARANTEE</div>
+          <h2 className="text-3xl font-bold text-white">Privacy &amp; Security</h2>
           <p className="text-muted text-sm max-w-2xl mt-1">
-            Why A.E.G.I.S. is fundamentally different from commercial gateways: your email data never leaves your workstation.
+            100% on-device processing: your email contents and tokens never leave your browser.
           </p>
         </div>
 
@@ -233,11 +233,14 @@ export function ScorecardAndGovernance() {
         </div>
       </section>
 
-      {/* 4. Development Roadmap */}
-      <section id="roadmap" className="space-y-6">
+      {/* 4. Project Roadmap */}
+      <section id="roadmap" className="space-y-6 scroll-mt-20">
         <div>
-          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">INCREMENTAL DELIVERY</div>
-          <h2 className="text-3xl font-bold text-white">Multi-Phase Trajectory</h2>
+          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">PLANNED MILESTONES</div>
+          <h2 className="text-3xl font-bold text-white">Project Roadmap</h2>
+          <p className="text-muted text-sm max-w-2xl mt-1">
+            Delivery milestones across Phase 1 Shipped, Phase 2 RC, and Phase 3 Future.
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -264,13 +267,13 @@ export function ScorecardAndGovernance() {
         </div>
       </section>
 
-      {/* 5. Team Section */}
-      <section id="team" className="space-y-6">
+      {/* 5. Team Members */}
+      <section id="team" className="space-y-6 scroll-mt-20">
         <div>
-          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">SIH 2026 TEAM</div>
-          <h2 className="text-3xl font-bold text-white">Team A.E.G.I.S. Members</h2>
+          <div className="mono text-xs text-mint tracking-widest uppercase mb-2">SIH 2026 CONTRIBUTORS</div>
+          <h2 className="text-3xl font-bold text-white">Team Members</h2>
           <p className="text-muted text-sm max-w-2xl mt-1">
-            Multidisciplinary team spanning extension backend engineering, web platform QA, UI/UX design, threat research, and product strategy.
+            The 6 engineering, design, threat research, and strategy contributors behind A.E.G.I.S.
           </p>
         </div>
 
@@ -292,36 +295,111 @@ export function ScorecardAndGovernance() {
         </div>
       </section>
 
-      {/* 6. Help & Installation Section */}
-      <section id="help" className="bg-panel border border-line rounded-lg p-6 sm:p-8 space-y-6">
-        <div className="mono text-xs text-mint uppercase tracking-widest">TESTING &amp; DEPLOYMENT REFERENCE</div>
-        <h2 className="text-2xl font-bold text-white">How to Test the Extension Locally</h2>
-        <div className="grid md:grid-cols-3 gap-4 text-xs">
-          <div className="bg-panel2 p-4 rounded border border-line space-y-2">
-            <div className="font-bold text-white">1. Load Unpacked Extension</div>
-            <p className="text-muted">
-              Open Chrome/Edge, navigate to <code className="text-mint mono">chrome://extensions</code>, toggle Developer Mode ON, and click Load unpacked.
+      {/* 6. Installation Guide */}
+      <section id="help" className="bg-panel border border-line rounded-lg p-6 sm:p-8 space-y-6 scroll-mt-20">
+        <div className="mono text-xs text-mint uppercase tracking-widest">SETUP &amp; TESTING INSTRUCTIONS</div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-line pb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Installation Guide</h2>
+            <p className="text-muted text-xs mt-1">
+              Step-by-step instructions to load and test the unpacked extension in Chrome or Edge.
             </p>
-            <div className="mono text-[10px] text-muted bg-panel p-2 rounded">
-              Folder: C:\SIH_club\AEGIS_v0.38.0_Phase1_Proof_of_Action_RC
+          </div>
+          <span className="mono text-xs bg-panel2 border border-mint/40 text-mint px-3 py-1 rounded shrink-0 self-start md:self-auto">
+            RC v0.41.0 (SIH 26106 Phase 1 Final)
+          </span>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div className="bg-panel2 p-4 rounded border border-line space-y-2">
+            <div className="font-bold text-white flex items-center gap-2">
+              <span className="text-mint">1.</span> Load Unpacked Extension
+            </div>
+            <p className="text-muted leading-relaxed">
+              Open Chrome or Edge, navigate to <code className="text-mint mono">chrome://extensions</code>, enable <strong>Developer Mode</strong> toggle (top right), click <strong>Load unpacked</strong>, and select:
+            </p>
+            <div className="mono text-[10px] text-white bg-panel p-2 rounded border border-line break-all select-all">
+              C:\SIH_club\AEGIS_v0.41.0_Phase1_Final_RC
             </div>
           </div>
+
           <div className="bg-panel2 p-4 rounded border border-line space-y-2">
-            <div className="font-bold text-white">2. Launch Local Dashboard</div>
-            <p className="text-muted">
-              In VS Code terminal, run <code className="text-mint mono">npm run dev</code> inside <code className="mono text-white">ARGUS/aegis-site</code>.
+            <div className="font-bold text-white flex items-center gap-2">
+              <span className="text-mint">2.</span> Launch Companion Site
+            </div>
+            <p className="text-muted leading-relaxed">
+              In your terminal, run development server inside the web application directory:
             </p>
-            <div className="mono text-[10px] text-muted bg-panel p-2 rounded">
-              URL: http://localhost:5173
+            <div className="mono text-[10px] text-muted bg-panel p-2 rounded space-y-1">
+              <div><code className="text-mint mono">cd c:\SIH_club\ARGUS\aegis-site</code></div>
+              <div><code className="text-white mono">npm run dev</code></div>
+              <div className="text-mint pt-1 font-semibold">URL: http://localhost:5173</div>
             </div>
           </div>
+
           <div className="bg-panel2 p-4 rounded border border-line space-y-2">
-            <div className="font-bold text-white">3. Verify Zero-Token Link</div>
-            <p className="text-muted">
-              Open Gmail or Outlook in one tab, and the website in another. The dashboard connects via background service worker with zero token pasting!
+            <div className="font-bold text-white flex items-center gap-2">
+              <span className="text-mint">3.</span> Zero-Token Local Bridge
+            </div>
+            <p className="text-muted leading-relaxed">
+              Open Gmail or Outlook in one tab, and dashboard in another. The SOC feed connects to the extension background worker via runtime messaging:
             </p>
-            <div className="mono text-[10px] text-mint bg-panel p-2 rounded">
-              Extension ID: feblkjonnopmmcojjidcnakbpdpkmajh
+            <div className="mono text-[10px] text-mint bg-panel p-2 rounded border border-mint/30">
+              ID: feblkjonnopmmcojjidcnakbpdpkmajh
+            </div>
+          </div>
+
+          <div className="bg-panel2 p-4 rounded border border-line space-y-2">
+            <div className="font-bold text-white flex items-center gap-2">
+              <span className="text-mint">4.</span> Athena Managed AI Gateway
+            </div>
+            <p className="text-muted leading-relaxed">
+              Deployable serverless proxy (<code className="text-mint mono">/api/athena</code>) keeps Gemini keys securely on the server. Extension operates in managed mode with <strong>zero keys required</strong> from users.
+            </p>
+            <div className="mono text-[10px] text-mint bg-panel p-2 rounded border border-mint/30">
+              Auto-Discovery &amp; Offline Fallback
+            </div>
+          </div>
+        </div>
+
+        {/* In-Depth Testing & Troubleshooting Matrix */}
+        <div className="bg-panel2 border border-line rounded-lg p-5 space-y-4">
+          <div className="mono text-xs font-semibold text-white flex items-center gap-2">
+            <span>🛠️</span> Extension Verification &amp; Testing Checklist
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-2">
+              <div className="font-semibold text-mint flex items-center gap-1.5">
+                <span>✓</span> Testing with Live Gmail
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-muted text-[11px]">
+                <li>Open any email in your Gmail tab (<code className="text-white mono">mail.google.com</code>).</li>
+                <li>Click the <strong>A.E.G.I.S.</strong> shield icon in your browser toolbar to execute on-device scoring.</li>
+                <li>Navigate to the <strong>SOC Dashboard</strong> or <strong>Live Simulator</strong> tab and click &quot;Sync from Extension&quot;.</li>
+                <li>The newly opened email appears at the top of the cumulative session feed with <code className="text-mint mono">[● ACTIVE IN GMAIL]</code> while preserving all prior scans.</li>
+              </ol>
+            </div>
+
+            <div className="space-y-2">
+              <div className="font-semibold text-mint flex items-center gap-1.5">
+                <span>✓</span> Testing with Outlook Web
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-muted text-[11px]">
+                <li>Open Outlook Web (<code className="text-white mono">outlook.live.com</code> or <code className="text-white mono">outlook.office.com</code>).</li>
+                <li>Open any message containing links or attachments.</li>
+                <li>Click the A.E.G.I.S. extension icon to trigger cross-provider parity extraction.</li>
+                <li>Telemetry is processed 100% in browser memory with zero email contents sent over the network.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div className="border-t border-line/60 pt-3 text-[11px] text-muted flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <strong className="text-white">Troubleshooting Bridge Connection:</strong> If the status displays &ldquo;STANDALONE SOC MODE&rdquo;, ensure Developer Mode is active on <code className="text-mint mono">chrome://extensions</code> and click the reload icon ↻ on the A.E.G.I.S. card.
+            </div>
+            <div className="mono text-[10px] text-mint">
+              100% CLIENT-SIDE ENFORCEMENT
             </div>
           </div>
         </div>

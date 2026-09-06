@@ -9,7 +9,7 @@ function ShieldMark({ size = 18 }) {
   );
 }
 
-export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
+export function Navbar({ activeView, setActiveView, isExtensionLinked, theme = "dark", setTheme = () => {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -26,19 +26,19 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
   }, []);
 
   const navViews = [
-    { id: "showcase", label: "Showcase" },
+    { id: "home", label: "Home" },
     { id: "architecture", label: "Architecture & AI" },
     { id: "dashboard", label: "SOC Dashboard", badge: true },
     { id: "simulator", label: "Live Simulator", icon: "⚡" },
   ];
 
   const exploreLinks = [
-    { id: "problem", label: "Problem Statement (SIH 26106)", sub: "AICTE Cyber Security Cell" },
-    { id: "coverage", label: "Honest Phase Scorecard (~48%)", sub: "Phase 1 Completed vs Phase 2 RC" },
-    { id: "boundary", label: "Privacy & Zero-Storage", sub: "100% on-device architecture" },
-    { id: "roadmap", label: "Development Roadmap", sub: "Milestones 00 through 04" },
-    { id: "team", label: "Hackathon Team", sub: "All 6 contributing members" },
-    { id: "help", label: "Help & Installation Guide", sub: "Load unpacked extension" },
+    { id: "problem", label: "Problem Statement", sub: "SIH 26106 · AICTE Cyber Security" },
+    { id: "coverage", label: "Project Scorecard", sub: "Features completed vs upcoming" },
+    { id: "boundary", label: "Privacy & Security", sub: "100% on-device · Zero data stored" },
+    { id: "roadmap", label: "Project Roadmap", sub: "Phase 1, Phase 2, and Phase 3 plans" },
+    { id: "team", label: "Team Members", sub: "All 6 contributors & roles" },
+    { id: "help", label: "Installation Guide", sub: "How to test the extension locally" },
   ];
 
   const handleExploreClick = (id) => {
@@ -57,16 +57,23 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
         {/* Brand / Logo */}
         <div className="flex items-center gap-6">
           <button
-            onClick={() => { setActiveView("showcase"); setMobileMenuOpen(false); }}
-            className="flex items-center gap-3 text-left focus:outline-none"
+            onClick={() => {
+              setActiveView("home");
+              setMobileMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              if (document.documentElement) document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+              if (document.body) document.body.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="flex items-center gap-3 text-left focus:outline-none group cursor-pointer"
+            title="Return to Home Overview / Scroll to Top"
           >
-            <span className="w-9 h-9 rounded-md border border-mint/40 flex items-center justify-center text-mint bg-panel shadow-sm">
+            <span className="w-9 h-9 rounded-md border border-mint/40 flex items-center justify-center text-mint bg-panel shadow-sm group-hover:border-mint transition-colors">
               <ShieldMark />
             </span>
             <div>
               <div className="font-semibold tracking-wider text-sm text-white flex items-center gap-1.5">
                 <span>A.E.G.I.S.</span>
-                <span className="text-[9px] px-1.5 py-0.2 rounded bg-mint/10 text-mint border border-mint/30 mono">v0.38</span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-mint/10 text-mint border border-mint/30 mono">v0.41</span>
               </div>
               <div className="mono text-[9px] text-muted tracking-widest mt-0.5">CYBER MEMBRANE</div>
             </div>
@@ -94,9 +101,35 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
           </nav>
         </div>
 
-        {/* Right Area: Explore Dropdown & Connection Badge */}
+        {/* Right Area: Theme Toggle, Explore Dropdown & Connection Badge */}
         <div className="flex items-center gap-3">
-          {/* Explore & Docs Dropdown */}
+          {/* Dark / Light Mode Switcher */}
+          <button
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="w-9 h-9 rounded-md border border-line bg-panel hover:bg-panel2 flex items-center justify-center text-muted hover:text-white transition-all active:scale-95 shadow-sm"
+            title={theme === "light" ? "Switch to Dark Mode (Obsidian / Mint)" : "Switch to Light Mode (Clean Slate / Emerald)"}
+            aria-label="Toggle Theme"
+          >
+            {theme === "light" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-mint">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            )}
+          </button>
+
+          {/* Explore Dropdown */}
           <div className="relative hidden lg:block" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -106,7 +139,7 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
                   : "border-line text-muted hover:text-white bg-panel hover:bg-panel2"
               }`}
             >
-              <span>Explore &amp; Docs</span>
+              <span>Explore</span>
               <span className="text-[10px]">{dropdownOpen ? "▲" : "▼"}</span>
             </button>
 
@@ -133,10 +166,10 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
 
           {/* Quick CTA Button */}
           <button
-            onClick={() => setActiveView(activeView === "dashboard" ? "showcase" : "dashboard")}
+            onClick={() => setActiveView(activeView === "dashboard" ? "home" : "dashboard")}
             className="hidden sm:flex items-center gap-2 bg-mint text-ink font-semibold text-xs px-4 py-2 rounded hover:bg-mintdim active:scale-[0.97] transition-all shrink-0"
           >
-            {activeView === "dashboard" ? "Showcase Overview →" : "Open SOC Dashboard →"}
+            {activeView === "dashboard" ? "Home Overview →" : "Open SOC Dashboard →"}
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -157,7 +190,16 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-panel2 border-b border-line px-6 py-4 space-y-4 animate-fade-up">
-          <div className="mono text-[10px] text-muted tracking-wider uppercase mb-2">Primary Views:</div>
+          <div className="flex items-center justify-between">
+            <span className="mono text-[10px] text-muted tracking-wider uppercase">Primary Views:</span>
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="mono text-[11px] text-mint flex items-center gap-1.5 px-2 py-1 rounded bg-panel border border-line"
+            >
+              <span>{theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}</span>
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             {navViews.map((v) => (
               <button
@@ -177,7 +219,7 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked }) {
           </div>
 
           <div className="border-t border-line pt-3">
-            <div className="mono text-[10px] text-muted tracking-wider uppercase mb-2">Documentation &amp; Team:</div>
+            <div className="mono text-[10px] text-muted tracking-wider uppercase mb-2">Explore:</div>
             <div className="space-y-1">
               {exploreLinks.map((item) => (
                 <button
