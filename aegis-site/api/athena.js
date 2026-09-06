@@ -62,7 +62,7 @@ function sanitizeEvidence(evidence) {
   };
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   applyHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method === "GET") {
