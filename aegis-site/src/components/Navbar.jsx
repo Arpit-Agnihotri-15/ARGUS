@@ -29,7 +29,6 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked, theme = "
     { id: "home", label: "Home" },
     { id: "architecture", label: "Architecture & AI" },
     { id: "dashboard", label: "SOC Dashboard", badge: true },
-    { id: "simulator", label: "Live Simulator", icon: "⚡" },
   ];
 
   const exploreLinks = [
