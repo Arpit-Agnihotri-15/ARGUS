@@ -1,8 +1,59 @@
+
+import React, { Component } from "react";
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("A.E.G.I.S. View Caught Error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="max-w-3xl mx-auto my-12 p-6 bg-panel border border-rose/50 rounded-xl space-y-4 text-white shadow-2xl">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <h3 className="font-bold text-lg text-rose">View Rendering Interrupted</h3>
+              <p className="text-xs text-muted">A client runtime error was caught safely by the A.E.G.I.S. Error Boundary.</p>
+            </div>
+          </div>
+          <div className="p-3 bg-black/50 border border-line rounded mono text-xs text-rose/90 overflow-x-auto">
+            {String(this.state.error?.message || this.state.error || "Unknown runtime exception")}
+          </div>
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                if (typeof window !== "undefined") window.location.href = "/?view=home";
+              }}
+              className="bg-mint text-ink font-bold px-4 py-2 rounded text-xs hover:bg-mintdim transition-all cursor-pointer"
+            >
+              Reset to Home View →
+            </button>
+            <button
+              onClick={() => this.setState({ hasError: false, error: null })}
+              className="mono text-xs border border-line bg-panel2 px-3 py-2 rounded hover:text-white text-muted transition-colors cursor-pointer"
+            >
+              Retry Rendering
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 import { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar.jsx";
 import { CyberGlobe3D } from "./components/CyberGlobe3D.jsx";
 import { SocDashboard } from "./components/SocDashboard.jsx";
-import { LiveSimulator } from "./components/LiveSimulator.jsx";
 import { InteractiveAiCharts } from "./components/InteractiveAiCharts.jsx";
 import { MembraneTopologyChart } from "./components/MembraneTopologyChart.jsx";
 import { ScorecardAndGovernance } from "./components/ScorecardAndGovernance.jsx";
@@ -52,13 +103,7 @@ function HomeView({ setActiveView, isExtensionLinked, telemetry, theme }) {
               >
                 Open SOC Dashboard <span>→</span>
               </button>
-              <button
-                onClick={() => setActiveView("simulator")}
-                className="mono text-xs border border-line hover:border-mint/50 bg-panel px-4 py-3 rounded text-white hover:bg-panel2 transition-all flex items-center gap-1.5 shadow-sm"
-              >
-                ⚡ Test Live Simulator
-              </button>
-              <button
+                            <button
                 onClick={() => setActiveView("architecture")}
                 className="mono text-xs border border-line px-4 py-3 rounded text-muted hover:text-white bg-panel2 transition-all shadow-sm"
               >
@@ -227,7 +272,7 @@ function HomeView({ setActiveView, isExtensionLinked, telemetry, theme }) {
             <div className="mono text-xs text-mint tracking-wider uppercase">READY TO EVALUATE?</div>
             <h3 className="text-2xl font-bold text-white">Test Live Threats Against Real Inbox Mails</h3>
             <p className="text-muted text-sm">
-              Launch the SOC Live Dashboard to inspect real-time mailbox threat telemetry, or open the Live Simulator to test live Gmail messages against the on-device engine.
+              Launch the SOC Live Dashboard to inspect real-time mailbox threat telemetry, or explore the on-device AI architecture.
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -237,13 +282,7 @@ function HomeView({ setActiveView, isExtensionLinked, telemetry, theme }) {
             >
               Open SOC Dashboard →
             </button>
-            <button
-              onClick={() => setActiveView("simulator")}
-              className="mono text-xs border border-line bg-panel hover:bg-panel2 text-white px-4 py-2.5 rounded transition-colors shadow-sm"
-            >
-              ⚡ Live Simulator Sandbox
-            </button>
-          </div>
+                      </div>
         </div>
       </section>
     </div>
@@ -285,7 +324,7 @@ export default function App() {
   // Initialize activeView from URL query parameter, hash, or localStorage so Ctrl+R stays on current page
   const [activeView, setActiveView] = useState(() => {
     if (typeof window !== "undefined") {
-      const validViews = ["home", "architecture", "dashboard", "simulator", "scorecard"];
+      const validViews = ["home", "architecture", "dashboard", "scorecard"];
       const urlParams = new URLSearchParams(window.location.search);
       const queryView = urlParams.get("view");
       if (queryView && validViews.includes(queryView)) return queryView;
@@ -382,6 +421,7 @@ export default function App() {
 
       {/* Primary Dynamic View Content */}
       <main className="flex-1">
+        <ErrorBoundary>
         {activeView === "home" && (
           <HomeView
             setActiveView={setActiveView}
@@ -396,12 +436,8 @@ export default function App() {
             <SocDashboard />
           </div>
         )}
-        {activeView === "simulator" && (
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10">
-            <LiveSimulator />
-          </div>
-        )}
-        {activeView === "scorecard" && <ScorecardAndGovernance />}
+                {activeView === "scorecard" && <ScorecardAndGovernance />}
+              </ErrorBoundary>
       </main>
 
       {/* Universal Footer */}
