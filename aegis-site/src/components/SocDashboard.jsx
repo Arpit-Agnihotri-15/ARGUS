@@ -421,12 +421,12 @@ export function SocDashboard() {
   }, [showPairModal]);
 
   // Synchronize Extension Telemetry with Cumulative Session Accumulation
-  const syncWithExtension = () => {
-    setIsSyncing(true);
+  const syncWithExtension = (isManual = false) => {
+    if (isManual) setIsSyncing(true);
     if (typeof window !== "undefined" && window.chrome?.runtime?.sendMessage) {
       try {
         window.chrome.runtime.sendMessage(AEGIS_EXT_ID, { type: "GET_TELEMETRY" }, (res) => {
-          setIsSyncing(false);
+          if (isManual) setIsSyncing(false);
           if (res && res.ok && res.telemetry) {
             const rawMapCheck = res.telemetry.scanResultsByEmail || {};
             const lastCheck = res.telemetry.lastScan;
@@ -604,19 +604,19 @@ export function SocDashboard() {
           }
         });
       } catch {
-        setIsSyncing(false);
+        if (isManual) setIsSyncing(false);
         setSyncStatus("DETACHED");
       }
     } else {
-      setIsSyncing(false);
+      if (isManual) setIsSyncing(false);
       setIsExtensionLinked(false);
       setSyncStatus("DETACHED");
     }
   };
 
   useEffect(() => {
-    syncWithExtension();
-    const interval = setInterval(syncWithExtension, 3500);
+    syncWithExtension(false);
+    const interval = setInterval(() => syncWithExtension(false), 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -1767,7 +1767,7 @@ export function SocDashboard() {
                 {syncStatus === "LINKED" ? "A.E.G.I.S. EXTENSION LINKED" : "A.E.G.I.S. STANDALONE SOC MODE"}
               </span>
               <span className="mono text-[10px] bg-panel2 border border-line px-2 py-0.5 rounded text-mint">
-                v0.41.0 RC
+                v1.43.2 QA
               </span>
               <span className="mono text-[10px] bg-black/40 border border-line text-muted px-2 py-0.5 rounded">
                 SESSION: {currentUser}

@@ -50,7 +50,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navbar } from "./components/Navbar.jsx";
 import { CyberGlobe3D } from "./components/CyberGlobe3D.jsx";
 import { SocDashboard } from "./components/SocDashboard.jsx";
@@ -103,11 +103,25 @@ function HomeView({ setActiveView, isExtensionLinked, telemetry, theme }) {
               >
                 Open SOC Dashboard <span>→</span>
               </button>
-                            <button
+              <button
                 onClick={() => setActiveView("architecture")}
                 className="mono text-xs border border-line px-4 py-3 rounded text-muted hover:text-white bg-panel2 transition-all shadow-sm"
               >
                 Explore AI &amp; Architecture
+              </button>
+              <button
+                onClick={() => {
+                  setActiveView("scorecard");
+                  if (typeof window !== "undefined") window.location.hash = "casestudy";
+                  setTimeout(() => {
+                    const el = document.getElementById("casestudy");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }, 80);
+                }}
+                className="mono text-xs border border-mint/40 px-4 py-3 rounded text-mint hover:text-white bg-mint/5 hover:bg-mint/15 transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <span>UCSC AiTM Case Study</span>
+                <span className="text-[10px]">↗</span>
               </button>
             </div>
 
@@ -340,6 +354,7 @@ export default function App() {
 
   const [isExtensionLinked, setIsExtensionLinked] = useState(false);
   const [telemetry, setTelemetry] = useState(null);
+  const lastAppTelemetryFingerprintRef = useRef("");
 
   // Dark / Light Mode theme state with default dark theme
   const [theme, setTheme] = useState(() => {
@@ -391,7 +406,11 @@ export default function App() {
               // Fetch telemetry if available
               window.chrome.runtime.sendMessage(AEGIS_EXT_ID, { type: "GET_TELEMETRY" }, (telRes) => {
                 if (telRes && telRes.ok) {
-                  setTelemetry(telRes);
+                  const fp = JSON.stringify(telRes.telemetry || telRes);
+                  if (fp !== lastAppTelemetryFingerprintRef.current) {
+                    lastAppTelemetryFingerprintRef.current = fp;
+                    setTelemetry(telRes);
+                  }
                 }
               });
             } else {
@@ -404,7 +423,7 @@ export default function App() {
       }
     };
     probe();
-    const interval = setInterval(probe, 4000);
+    const interval = setInterval(probe, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -452,7 +471,7 @@ export default function App() {
 
           <div className="flex items-center gap-4 mono text-[11px]">
             <button onClick={() => setActiveView("scorecard")} className="hover:text-mint transition-colors">
-              Phase Scorecard (~48%)
+              Phase Scorecard (~65%)
             </button>
             <button onClick={() => setActiveView("scorecard")} className="hover:text-mint transition-colors">
               Team &amp; Governance
