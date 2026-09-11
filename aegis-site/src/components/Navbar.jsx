@@ -33,6 +33,7 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked, theme = "
 
   const exploreLinks = [
     { id: "problem", label: "Problem Statement", sub: "SIH 26106 · AICTE Cyber Security" },
+    { id: "casestudy", label: "Real Case Study Comparison", sub: "UCSC 2025 AiTM Phishing vs A.E.G.I.S." },
     { id: "coverage", label: "Project Scorecard", sub: "Features completed vs upcoming" },
     { id: "boundary", label: "Privacy & Security", sub: "100% on-device · Zero data stored" },
     { id: "roadmap", label: "Project Roadmap", sub: "Phase 1, Phase 2, and Phase 3 plans" },
@@ -44,10 +45,18 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked, theme = "
     setActiveView("scorecard");
     setDropdownOpen(false);
     setMobileMenuOpen(false);
-    setTimeout(() => {
+    if (typeof window !== "undefined") {
+      window.location.hash = id;
+    }
+    const tryScroll = (attempts = 0) => {
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      } else if (attempts < 20) {
+        setTimeout(() => tryScroll(attempts + 1), 50);
+      }
+    };
+    setTimeout(() => tryScroll(), 50);
   };
 
   return (
@@ -66,13 +75,13 @@ export function Navbar({ activeView, setActiveView, isExtensionLinked, theme = "
             className="flex items-center gap-3 text-left focus:outline-none group cursor-pointer"
             title="Return to Home Overview / Scroll to Top"
           >
-            <span className="w-9 h-9 rounded-md border border-mint/40 flex items-center justify-center text-mint bg-panel shadow-sm group-hover:border-mint transition-colors">
-              <ShieldMark />
+            <span className="w-9 h-9 rounded-md border border-mint/40 flex items-center justify-center bg-panel shadow-sm group-hover:border-mint transition-colors overflow-hidden p-1 shrink-0">
+              <img src="/logo.png" alt="A.E.G.I.S. Logo" className="w-full h-full object-contain" />
             </span>
             <div>
               <div className="font-semibold tracking-wider text-sm text-white flex items-center gap-1.5">
                 <span>A.E.G.I.S.</span>
-                <span className="text-[9px] px-1.5 py-0.2 rounded bg-mint/10 text-mint border border-mint/30 mono">v0.41</span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-mint/10 text-mint border border-mint/30 mono">v1.43.2</span>
               </div>
               <div className="mono text-[9px] text-muted tracking-widest mt-0.5">CYBER MEMBRANE</div>
             </div>
